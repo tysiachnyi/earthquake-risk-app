@@ -2,22 +2,23 @@ import Link from "next/link";
 
 export const Navigation = () => {
   return (
-    <nav className="bg-gray-800 p-4">
+    <nav className="sticky top-0 z-50 flex items-center justify-between p-4 bg-gray-800 text-white">
+      <div className="text-lg font-bold">EQ Risk</div>
       <ul className="flex space-x-4">
         <li>
-          <Link href="/" className="text-white hover:text-gray-300">
+          <Link href="/" className="hover:underline">
             Home
           </Link>
         </li>
         <li>
-          <a href="/about" className="text-white hover:text-gray-300">
+          <Link href="/about" className="hover:underline">
             About
-          </a>
+          </Link>
         </li>
         <li>
-          <a href="/contact" className="text-white hover:text-gray-300">
+          <Link href="/contact" className="hover:underline">
             Contact
-          </a>
+          </Link>
         </li>
       </ul>
     </nav>
