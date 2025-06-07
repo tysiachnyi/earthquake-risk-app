@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Header, Paragraph } from "../components";
 
 export default function AboutPage() {
@@ -40,7 +41,7 @@ export default function AboutPage() {
           </div>
 
           <div className="pt-4 flex items-center space-x-2">
-            <a
+            <Link
               href="https://github.com/tysiachnyi/earthquake-risk-app"
               target="_blank"
               rel="noopener noreferrer"
@@ -60,7 +61,7 @@ export default function AboutPage() {
                 />
               </svg>
               <span>View on GitHub</span>
-            </a>
+            </Link>
           </div>
         </div>
       </div>
