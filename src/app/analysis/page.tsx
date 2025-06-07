@@ -86,39 +86,84 @@ export default function AnalysisPage() {
     timeRange: "5years",
   });
 
-  const handleLocationSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!location.trim()) return;
-
-    setIsLoading(true);
+  const handleLocationSubmit = async (
+    e?: React.FormEvent,
+    useGeolocation: boolean = false
+  ) => {
+    if (e) e.preventDefault();
     setError("");
+    setIsLoading(true);
 
     try {
-      // Geocode location
-      const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
-          location
-        )}&limit=1`
-      );
-      const data = await response.json();
+      let lat: number | undefined = undefined;
+      let lon: number | undefined = undefined;
+      let locString: string | undefined = undefined;
 
-      if (data && data.length > 0) {
-        const lat = parseFloat(data[0].lat);
-        const lon = parseFloat(data[0].lon);
-        setCoordinates([lat, lon]);
+      if (useGeolocation) {
+        // Get location from browser geolocation
+        if (!navigator.geolocation) {
+          setError("Geolocation is not supported by this browser.");
+          setIsLoading(false);
+          return;
+        }
+        await new Promise<void>((resolve, reject) => {
+          navigator.geolocation.getCurrentPosition(
+            (position) => {
+              lat = position.coords.latitude;
+              lon = position.coords.longitude;
+              locString = `${lat.toFixed(6)}, ${lon.toFixed(6)}`;
+              setCoordinates([lat, lon]);
+              setLocation(locString);
+              resolve();
+            },
+            (error) => {
+              setError(
+                "Error getting your location. Please enter it manually."
+              );
+              setIsLoading(false);
+              reject(error);
+            }
+          );
+        });
+      } else {
+        // Manual location input
+        if (!location.trim()) {
+          setIsLoading(false);
+          return;
+        }
+        // Geocode location
+        const response = await fetch(
+          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
+            location
+          )}&limit=1`
+        );
+        const data = await response.json();
+
+        if (data && data.length > 0) {
+          lat = parseFloat(data[0].lat);
+          lon = parseFloat(data[0].lon);
+          setCoordinates([lat, lon]);
+        } else {
+          setError("Location not found. Please try a different search term.");
+          setIsLoading(false);
+          return;
+        }
+      }
+
+      if (typeof lat === "number" && typeof lon === "number") {
         await fetchEarthquakeData(lat, lon);
       } else {
-        setError("Location not found. Please try a different search term.");
+        setError("Could not determine coordinates. Please try again.");
       }
     } catch (error) {
-      console.error("Error geocoding location:", error);
-      setError("Error finding location. Please try again.");
+      setError("Error finding location. Please try again." + error);
     } finally {
       setIsLoading(false);
     }
   };
 
   const fetchEarthquakeData = async (lat: number, lon: number) => {
+    console.log("Fetching earthquake data for:", lat, lon);
     try {
       // Calculate date range
       const endDate = new Date();
@@ -184,32 +229,13 @@ export default function AnalysisPage() {
 
       const analysisResult = await response.json();
       setAnalysis(analysisResult);
+      return;
     } catch (error) {
       console.error("Error analyzing earthquake data:", error);
       setError("Error analyzing earthquake data.");
+    } finally {
+      setIsLoading(false);
     }
-  };
-
-  const getCurrentLocation = () => {
-    if (!navigator.geolocation) {
-      setError("Geolocation is not supported by this browser.");
-      return;
-    }
-
-    setIsLoading(true);
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const { latitude, longitude } = position.coords;
-        setCoordinates([latitude, longitude]);
-        setLocation(`${latitude.toFixed(6)}, ${longitude.toFixed(6)}`);
-        fetchEarthquakeData(latitude, longitude);
-      },
-      (error) => {
-        console.error("Error getting location:", error);
-        setError("Error getting your location. Please enter it manually.");
-        setIsLoading(false);
-      }
-    );
   };
 
   const getRiskColor = (level: string) => {
@@ -270,7 +296,10 @@ export default function AnalysisPage() {
             </p>
           </div>
 
-          <form onSubmit={handleLocationSubmit} className="space-y-6">
+          <form
+            onSubmit={(e) => handleLocationSubmit(e, false)}
+            className="space-y-6"
+          >
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <div className="lg:col-span-2">
                 <label
@@ -408,7 +437,7 @@ export default function AnalysisPage() {
 
               <button
                 type="button"
-                onClick={getCurrentLocation}
+                onClick={() => handleLocationSubmit(undefined, true)}
                 disabled={isLoading}
                 className="inline-flex items-center px-8 py-3 bg-gray-600 text-white font-semibold rounded-lg hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 transform hover:scale-105"
               >
