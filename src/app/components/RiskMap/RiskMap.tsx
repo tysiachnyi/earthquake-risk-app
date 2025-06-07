@@ -103,7 +103,7 @@ function getSignificanceDescription(significance: number): string {
   return "Low";
 }
 
-export default function EarthquakeMapComponent({
+export default function RiskMap({
   coordinates,
   earthquakes = [],
 }: EarthquakeMapComponentProps) {
