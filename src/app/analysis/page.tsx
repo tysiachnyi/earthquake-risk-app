@@ -257,10 +257,8 @@ export default function AnalysisPage() {
   };
 
   return (
-    <main className="min-h-screen py-8 bg-gray-50">
+    <main className="min-h-screen py-8">
       <div className="max-w-7xl mx-auto px-4">
-        <Header text="Earthquake Risk Analysis" />
-
         {/* Location Input Section */}
         <div className="bg-white rounded-lg shadow-lg p-8 mb-8">
           <div className="text-center mb-6">

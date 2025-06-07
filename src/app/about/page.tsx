@@ -2,7 +2,7 @@ import { Header, Paragraph } from "../components";
 
 export default function AboutPage() {
   return (
-    <main className="min-h-screen py-8 bg-gray-50">
+    <main className="min-h-screen py-8 ">
       <div className="max-w-4xl mx-auto px-4">
         <Header text="About EQ Risk App" />
 

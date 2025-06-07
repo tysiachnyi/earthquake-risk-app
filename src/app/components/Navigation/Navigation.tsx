@@ -11,11 +11,6 @@ export const Navigation = () => {
           </Link>
         </li>
         <li>
-          <Link href="/map" className="hover:underline">
-            Map
-          </Link>
-        </li>
-        <li>
           <Link href="/analysis" className="hover:underline">
             Analysis
           </Link>
