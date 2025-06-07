@@ -82,9 +82,9 @@ export default function AnalysisPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [filters, setFilters] = useState({
-    radius: 100,
-    minMagnitude: 2.5,
-    timeRange: "1year",
+    radius: 200,
+    minMagnitude: 2.0,
+    timeRange: "5years",
   });
 
   const handleLocationSubmit = async (e: React.FormEvent) => {
@@ -227,25 +227,33 @@ export default function AnalysisPage() {
   };
 
   const formatMagnitudeData = () => {
-    if (!analysis?.magnitudeAnalysis?.distribution) return [];
+    if (!analysis?.magnitudeAnalysis?.distribution) {
+      return [];
+    }
 
-    return Object.entries(analysis.magnitudeAnalysis.distribution)
+    const data = Object.entries(analysis.magnitudeAnalysis.distribution)
       .map(([mag, count]) => ({
         magnitude: parseFloat(mag),
         count: count as number,
       }))
       .sort((a, b) => a.magnitude - b.magnitude);
+
+    return data;
   };
 
   const formatTemporalData = () => {
-    if (!analysis?.temporalAnalysis?.monthlyActivity) return [];
+    if (!analysis?.temporalAnalysis?.monthlyActivity) {
+      return [];
+    }
 
-    return Object.entries(analysis.temporalAnalysis.monthlyActivity)
+    const data = Object.entries(analysis.temporalAnalysis.monthlyActivity)
       .map(([month, count]) => ({
         month,
         count: count as number,
       }))
       .sort((a, b) => a.month.localeCompare(b.month));
+
+    return data;
   };
 
   return (
@@ -595,15 +603,39 @@ export default function AnalysisPage() {
               <h3 className="text-xl font-semibold mb-4 text-gray-800">
                 Magnitude Distribution
               </h3>
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={formatMagnitudeData()}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="magnitude" />
-                  <YAxis />
-                  <Tooltip />
-                  <Bar dataKey="count" fill="#3B82F6" />
-                </BarChart>
-              </ResponsiveContainer>
+              {formatMagnitudeData().length > 0 ? (
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart data={formatMagnitudeData()}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="magnitude" />
+                    <YAxis />
+                    <Tooltip />
+                    <Bar dataKey="count" fill="#3B82F6" />
+                  </BarChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="h-80 flex items-center justify-center text-gray-500">
+                  <div className="text-center">
+                    <svg
+                      className="w-16 h-16 mx-auto mb-4 text-gray-300"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                      />
+                    </svg>
+                    <p className="text-lg font-medium">No Earthquake Data</p>
+                    <p className="text-sm">
+                      Try expanding the search radius or time range
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Temporal Activity */}
@@ -611,20 +643,44 @@ export default function AnalysisPage() {
               <h3 className="text-xl font-semibold mb-4 text-gray-800">
                 Temporal Activity
               </h3>
-              <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={formatTemporalData()}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="month" />
-                  <YAxis />
-                  <Tooltip />
-                  <Line
-                    type="monotone"
-                    dataKey="count"
-                    stroke="#10B981"
-                    strokeWidth={2}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
+              {formatTemporalData().length > 0 ? (
+                <ResponsiveContainer width="100%" height={300}>
+                  <LineChart data={formatTemporalData()}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="month" />
+                    <YAxis />
+                    <Tooltip />
+                    <Line
+                      type="monotone"
+                      dataKey="count"
+                      stroke="#10B981"
+                      strokeWidth={2}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="h-80 flex items-center justify-center text-gray-500">
+                  <div className="text-center">
+                    <svg
+                      className="w-16 h-16 mx-auto mb-4 text-gray-300"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"
+                      />
+                    </svg>
+                    <p className="text-lg font-medium">No Temporal Data</p>
+                    <p className="text-sm">
+                      Try expanding the search radius or time range
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         )}
