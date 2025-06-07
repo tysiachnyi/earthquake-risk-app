@@ -16,17 +16,14 @@ import {
 } from "recharts";
 
 // Dynamic imports to avoid SSR issues
-const MapComponent = dynamic(
-  () => import("./components/EarthquakeMapComponent"),
-  {
-    ssr: false,
-    loading: () => (
-      <div className="h-96 bg-gray-200 animate-pulse rounded-lg flex items-center justify-center">
-        Loading Map...
-      </div>
-    ),
-  }
-);
+const MapComponent = dynamic(() => import("../components/RiskMap/RiskMap"), {
+  ssr: false,
+  loading: () => (
+    <div className="h-96 bg-gray-200 animate-pulse rounded-lg flex items-center justify-center">
+      Loading Map...
+    </div>
+  ),
+});
 
 interface EarthquakeData {
   id: string;
