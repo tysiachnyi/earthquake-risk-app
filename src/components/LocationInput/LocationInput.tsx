@@ -7,7 +7,13 @@ interface LocationInputProps {
     minMagnitude: number;
     timeRange: string;
   };
-  setFilters: (filters: any) => void;
+  setFilters: React.Dispatch<
+    React.SetStateAction<{
+      radius: number;
+      minMagnitude: number;
+      timeRange: string;
+    }>
+  >;
   location: string;
   setLocation: (location: string) => void;
 }
@@ -60,7 +66,7 @@ export default function LocationInput({
               <select
                 value={filters.radius}
                 onChange={(e) =>
-                  setFilters((prev: any) => ({
+                  setFilters((prev) => ({
                     ...prev,
                     radius: Number(e.target.value),
                   }))
@@ -81,7 +87,7 @@ export default function LocationInput({
               <select
                 value={filters.minMagnitude}
                 onChange={(e) =>
-                  setFilters((prev: any) => ({
+                  setFilters((prev) => ({
                     ...prev,
                     minMagnitude: Number(e.target.value),
                   }))
@@ -102,7 +108,7 @@ export default function LocationInput({
               <select
                 value={filters.timeRange}
                 onChange={(e) =>
-                  setFilters((prev: any) => ({
+                  setFilters((prev) => ({
                     ...prev,
                     timeRange: e.target.value,
                   }))
